@@ -1,17 +1,21 @@
 
 
-''
-item_agenda1 = {'nome' : 'José Antônio', 'telefone' : '73-8518111', 'email' : 'za@rocketseat.com', 'favorito' : False}
-item_agenda2 = {'nome' : 'Maria Silva', 'telefone' : '73-8518112', 'email' : 'ms@rocketseat.com', 'favorito' : True}
-item_agenda3 = {'nome' : 'Carlos Oliveira', 'telefone' : '73-8518113', 'email' : 'co@rocketseat.com', 'favorito' : False}
-item_agenda4 = {'nome' : 'Ana Costa', 'telefone' : '73-8518114', 'email' : 'ac@rocketseat.com', 'favorito' : True}
-item_agenda5 = {'nome' : 'Maria Costa', 'telefone' : '73-8518115', 'email' : 'mc@rocketseat.com', 'favorito' : True}
-item_agenda6 = {'nome' : 'Joana Costa', 'telefone' : '73-8518116', 'email' : 'jc@rocketseat.com', 'favorito' : True}
-item_agenda7 = {'nome' : 'Lidia Costa', 'telefone' : '73-8518117', 'email' : 'lc@rocketseat.com', 'favorito' : True}
+
+lista_agenda = [
+               {'nome' : 'José Antônio', 'telefone' : '73-8518111', 'email' : 'za@rocketseat.com', 'favorito' : False},
+               {'nome' : 'Maria Silva', 'telefone' : '73-8518112', 'email' : 'ms@rocketseat.com', 'favorito' : True},
+               {'nome' : 'Carlos Oliveira', 'telefone' : '73-8518113', 'email' : 'co@rocketseat.com', 'favorito' : False},
+               {'nome' : 'Ana Costa', 'telefone' : '73-8518114', 'email' : 'ac@rocketseat.com', 'favorito' : False},
+               {'nome' : 'Maria Costa', 'telefone' : '73-8518115', 'email' : 'mc@rocketseat.com', 'favorito' : False},
+               {'nome' : 'Joana Costa', 'telefone' : '73-8518116', 'email' : 'jc@rocketseat.com', 'favorito' : False},
+               {'nome' : 'Lidia Costa de Oliveira Brum Nascimento', 'telefone' : '73-8518117', 'email' : 'lc@rocketseat.com', 'favorito' : False},
+               {'nome' : 'Marcos Antonio Galvão', 'telefone' : '73-99988554', 'email' : 'ximbinha@rocketseat.com', 'favorito' : False}
+               ]
 
 
+# lista_agenda = [] 
 
-lista_agenda = [item_agenda1, item_agenda2, item_agenda3, item_agenda4, item_agenda5, item_agenda6, item_agenda7   ] 
+
 
 def print_menu():
     clear_screen()
@@ -21,18 +25,26 @@ def print_menu():
     print('2 - Adicionar contato')
     print('3 - Editar contato')
     print('4 - Excluir contato')
-    print('5 - Listar favoritos')
-    print('6 - Sair')
+    print('5 - Favoritar/Desfavoritar contato')
+    print('6 - Listar favoritos')
+    print('7 - Sair')
 
 def clear_screen():
     print("\n" * 100)
 
-def lista_contatos():
+def lista_contatos(favoritos=False):
     clear_screen()
-    print('Lista de contatos:')
+    size_max_nome = max(len(contato['nome']) for contato in lista_agenda) if lista_agenda else 0
+    size_max_telefone = max(len(contato['telefone']) for contato in lista_agenda) if lista_agenda else 0
+    size_max_email = max(len(contato['email']) for contato in lista_agenda) if lista_agenda else 0
+    print(f'Lista de contatos{"(favoritos):" if favoritos else ":"}  ')
+    total = 0
     for contato in lista_agenda:
-        print(f"Nome: {contato['nome']}, Telefone: {contato['telefone']}, Email: {contato['email']}, Favorito: {'Sim' if contato['favorito'] else 'Não'}")
-    print("Total de contatos:", len(lista_agenda)) 
+        if favoritos and not contato['favorito']:
+            continue
+        print(f"Nome: {(contato['nome']).ljust(size_max_nome)}, Telefone: {(contato['telefone']).ljust(size_max_telefone)}, Email: {(contato['email']).ljust(size_max_email)}, Favorito: {'Sim' if contato['favorito'] else 'Não'}")
+        total += 1
+    print("Total de contatos:", total) 
     input('Pressione Enter para continuar...')
 
 def edita_contato():
@@ -47,20 +59,15 @@ def edita_contato():
         for i, contato in enumerate(lista_agenda, start=1):
             print(f"{i} - {contato['nome']}")
         escolha = int(input('Digite o número do contato: ')) - 1
-        if escolha < 1 or escolha > len(lista_agenda):
+        if escolha < 0 or escolha >= len(lista_agenda):
             raise ValueError('Número do contato inválido.')
-        contato_selecionado = lista_agenda[escolha-1]
-        print(f"Editando contato: {contato_selecionado['nome']}")
+        contato_selecionado = lista_agenda[escolha]
+        print(f"Editando contato: {contato_selecionado['nome']} (Telefone: {contato_selecionado['telefone']}, Email: {contato_selecionado['email']}, Favorito: {'Sim' if contato_selecionado['favorito'] else 'Não'})")
         nome = input('Digite o novo nome do contato (deixe em branco para manter o nome atual): ').strip('\n')
         telefone = input('Digite o novo telefone do contato (deixe em branco para manter o telefone atual): ')
         email = input('Digite o novo email do contato (deixe em branco para manter o email atual): ')
         favorito = input('O contato é favorito? (s/n, deixe em branco para manter o status atual): ').lower()
-        if favorito in 'syt':
-            favorito = True
-        elif favorito in 'nf':
-            favorito = False
-        else:
-            favorito = contato_selecionado['favorito']
+        favorito = True if favorito in 'sy' else False if favorito in 'nf' else contato_selecionado['favorito']
     except Exception as e:
         print(f"Ocorreu um erro ao editar o contato: {e}")
         input('Pressione Enter para continuar...')
@@ -83,17 +90,47 @@ def excluir_contato():
         for i, contato in enumerate(lista_agenda, start=1):
             print(f"{i} - {contato['nome']}")
         escolha = int(input('Digite o número do contato: ')) - 1
-        if escolha < 1 or escolha > len(lista_agenda):
+        if escolha < 0 or escolha >= len(lista_agenda):
             raise ValueError('Número do contato inválido.')
-        contato_selecionado = lista_agenda[escolha-1]
+        contato_selecionado = lista_agenda[escolha]
         lista_agenda.remove(contato_selecionado)
         
+    except ValueError as e:    
+        print(f"Escolha um numero válido ")
+        input('Pressione Enter para continuar...')
     except Exception as e:
         print(f"Ocorreu um erro ao excluir o contato: {e}")
         input('Pressione Enter para continuar...')
     else:
         print('Contato excluído com sucesso!')
         input('Pressione Enter para continuar...')
+
+
+def favoritar_desfavoritar_contato():
+    try:
+        if not lista_agenda:
+            print('A agenda está vazia. Não há contatos para editar.')
+            input('Pressione Enter para continuar...')
+            return
+
+        clear_screen()
+        print('escolha o contato a ser favoritado/desfavoritado:')
+        for i, contato in enumerate(lista_agenda, start=1):
+            print(f"{i} - {contato['nome']} (Favorito: {'Sim' if contato['favorito'] else 'Não'})")
+        escolha = int(input('Digite o número do contato: ')) - 1
+        if escolha < 0 or escolha >= len(lista_agenda):
+            raise ValueError('Número do contato inválido.')
+        contato_selecionado = lista_agenda[escolha]
+        favorito = not contato_selecionado['favorito']
+        
+    except Exception as e:
+        print(f"Ocorreu um erro ao editar o contato: {e}")
+        input('Pressione Enter para continuar...')
+    else:
+        contato_selecionado['favorito'] = favorito
+        print(f'Contato {contato_selecionado["nome"]} {("favoritado" if favorito else "desfavoritado")} com sucesso!')
+        input('Pressione Enter para continuar...')
+
 
 
 def adiciona_contato():
@@ -122,7 +159,7 @@ def adiciona_contato():
 while True:
     print_menu()
     opcao = input('Digite a opção desejada: ')
-    if opcao == '6':    
+    if opcao == '7':    
         print('Saindo da agenda. Até mais!')
         break
     elif opcao == '1':
@@ -134,8 +171,9 @@ while True:
     elif opcao == '4':
         excluir_contato()
     elif opcao == '5':
-        print('Listar favoritos - Em desenvolvimento')
-        input('Pressione Enter para continuar...')
+        favoritar_desfavoritar_contato()
+    elif opcao == '6':
+        lista_contatos(favoritos=True)
     else:
         print('Opção inválida. Tente novamente.')
         input('Pressione Enter para continuar...')
